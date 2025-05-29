@@ -261,23 +261,26 @@ app.post('/api/questions', authenticateToken, (req, res) => {
         }
 
         const questionId = result.rows[0].id;
-        const stmt = pool.query('INSERT INTO answers (question_id, text) VALUES ($1, $2) RETURNING id', answers.map((text, index) => [questionId, text]));
-        
-        stmt.then(result => {
+        // Bulk insert answers with correct parameterization
+        const values = answers.map((_, i) => `($1, $${i + 2})`).join(', ');
+        const params = [questionId, ...answers];
+        const query = `INSERT INTO answers (question_id, text) VALUES ${values} RETURNING id, text`;
+        pool.query(query, params)
+          .then(result => {
             res.status(201).json({
-                id: questionId,
-                text,
-                answers: result.rows.map((row) => ({
-                    id: row.id,
-                    text: row.text,
-                    votes: 0
-                }))
+              id: questionId,
+              text,
+              answers: result.rows.map((row) => ({
+                id: row.id,
+                text: row.text,
+                votes: 0
+              }))
             });
-        })
-        .catch(err => {
+          })
+          .catch(err => {
             console.error('Error inserting answers:', err);
             res.status(500).json({ error: 'Failed to insert answers' });
-        });
+          });
     });
 });
 
