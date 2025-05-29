@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Szavazzá GO - Kérdések létrehozása és szavazás">
+    <link rel="stylesheet" href="src/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="public/output.jpg" type="image/x-icon">
+    <title>Szavazzá GO - Főoldal</title>
+</head>
+<body>
+<div class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark position-relative navbar-glow">
+        <div class="navbar-flare"></div>
+        <div class="container-fluid d-flex flex-column align-items-center px-4">
+            <div class="w-100 d-flex justify-content-center py-2">
+                <a class="navbar-brand mx-0" href="index.html" aria-label="Főoldal">
+                    <img src="public/output.jpg" alt="Szavazzá GO logó" height="100" class="d-inline-block align-top logo-glow">
+                </a>
+            </div>
+            <div class="w-100 d-flex justify-content-between align-items-center nav-flex-row">
+                <div class="nav-left d-flex">
+                    <ul class="navbar-nav d-flex flex-row mb-0">
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="sajatkerdes.html">
+                                <i class="fas fa-question-circle pe-2"></i>Saját kérdések
+                            </a>
+                        </li>
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="toplista.html">
+                                <i class="fas fa-trophy pe-2"></i>Toplista
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-center d-flex justify-content-center">
+                    <!-- No Főoldal button on homepage -->
+                </div>
+                <div class="nav-right d-flex">
+                    <ul class="navbar-nav d-flex flex-row mb-0">
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="gyik.html">
+                                <i class="fas fa-info-circle pe-2"></i>GYIK
+                            </a>
+                        </li>
+                        <li class="nav-item px-3" id="authNavItem">
+                            <button class="nav-link hover-glow btn btn-link" data-bs-toggle="modal" data-bs-target="#authModal">
+                                <i class="fas fa-sign-in-alt pe-2"></i>Bejelentkezés
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1" style="padding-top: 40px">
+        <div class="container-fluid py-4 h-100 position-relative">
+            <div class="divider-line"></div>
+            <div class="row g-0 h-100">
+                <!-- Questions Column -->
+                <div class="col-lg-6 h-100 d-flex flex-column pe-lg-3">
+                    <h2 class="text-center text-white mb-4 w-100">Kérdések</h2>
+                    <div id="questionsList" class="questions-grid flex-grow-1 homepage">
+                        <div id="emptyState" class="h-100 d-flex flex-column justify-content-center align-items-center">
+                            <div class="empty-state-icon mb-4 position-relative">
+                                <i class="fas fa-question-circle fa-4x text-white" aria-hidden="true"></i>
+                                <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 rounded-circle"
+                                    style="background: radial-gradient(circle, rgba(187,19,254,0.15) 0%, transparent 70%);"></div>
+                            </div>
+                            <h4 class="text-white mb-2">Nincsenek kérdések</h4>
+                            <p class="text-white mb-4">Létrehozhatod az elsőt!</p>
+                            <button class="btn btn-outline-primary hover-glow" id="createFirstQuestion">
+                                <i class="fas fa-arrow-right me-2"></i>Kérdés létrehozása
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creation Form Column -->
+                <div class="col-lg-5 h-100 d-flex flex-column ps-lg-3">
+                    <h2 class="text-center text-white mb-4">Létrehozás</h2>
+                    <div class="creation-form bg-darker rounded-3 p-4 flex-grow-1 border border-secondary">
+                        <form id="questionForm" novalidate>
+                            <!-- Question Input -->
+                            <div class="mb-4">
+                                <label for="questionInput" class="form-label text-white d-flex align-items-center">
+                                    <i class="fas fa-question me-2 text-white"></i>Kérdésed
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-white">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </span>
+                                    <input id="questionInput" type="text" class="form-control bg-dark text-white border-secondary"
+                                        placeholder="Ide írd a kérdést..." required maxlength="200">
+                                    <div class="invalid-feedback">Kérjük adj meg egy kérdést (max 200 karakter)!</div>
+                                </div>
+                                <div class="form-text text-end text-white-50"><span id="questionCounter">0</span>/200</div>
+                            </div>
+
+                            <!-- Answer Inputs -->
+                            <div id="answerInputsContainer" class="mb-4">
+                                <div class="mb-3">
+                                    <label class="form-label text-white d-flex align-items-center">
+                                        <i class="fas fa-list-ol me-2 text-white"></i>Válaszlehetőség 1
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-dark border-secondary text-white">1</span>
+                                        <input type="text" class="form-control bg-dark text-white border-secondary answer-input" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white d-flex align-items-center">
+                                        <i class="fas fa-list-ol me-2 text-white"></i>Válaszlehetőség 2
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-dark border-secondary text-white">2</span>
+                                        <input type="text" class="form-control bg-dark text-white border-secondary answer-input" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-light mb-3" id="addAnswerBtn">
+                                <i class="fas fa-plus"></i> További válaszlehetőség
+                            </button>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-create text-white w-100 py-2 mt-2">
+                                <i class="fas fa-plus-circle me-2"></i>KÉRDÉS LÉTREHOZÁSA
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-white mt-auto footer-glow">
+        <div class="footer-flare"></div>
+        <div class="container pt-4">
+            <div class="row justify-content-center g-3">
+                <div class="col-6 col-md-auto">
+                    <a href="index.html" class="text-white text-decoration-none hover-glow">Kezdőlap</a>
+                </div>
+                <div class="col-6 col-md-auto">
+                    <a href="toplista.html" class="text-white text-decoration-none hover-glow">Toplista</a>
+                </div>
+                <div class="col-6 col-md-auto">
+                    <a href="gyik.html" class="text-white text-decoration-none hover-glow">GYIK</a>
+                </div>
+            </div>
+            <hr class="my-3 mx-auto" style="max-width: 800px; border-color: #444;">
+            <div class="pb-3 text-center">
+                <a href="https://open.spotify.com/track/0126WdGxnrNEqzgUb1wgQH?si=b6bee61851234d29"
+                    class="text-white text-decoration-none hover-glow surprise-link"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-gift me-2"></i>SURPRISE ME
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom py-3">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-12 text-center">
+                        © 2025 Copyright:
+                        <a class="text-white fw-bold hover-glow" href="https://r33b.net/">Szavazzá GO</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-darker text-white">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="authModalLabel">Bejelentkezés / Regisztráció</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs nav-fill mb-3" id="authTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Bejelentkezés</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Regisztráció</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="authTabContent">
+                    <!-- Login Form -->
+                    <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="loginUsername" class="form-label">Felhasználónév</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="loginUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Jelszó</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-create w-100">Bejelentkezés</button>
+                        </form>
+                    </div>
+                    <!-- Register Form -->
+                    <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="registerUsername" class="form-label">Felhasználónév</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="registerUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">Jelszó</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="registerPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Jelszó megerősítése</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-create w-100">Regisztráció</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>

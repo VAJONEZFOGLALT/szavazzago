@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - SzavazzaGO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-darker">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">SzavazzaGO</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Főoldal</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="sajatkerdes.html">Saját kérdések</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="toplista.html">Toplista</a>
+          </li>
+          <li class="nav-item" id="logoutNavItem" style="display: none;">
+            <button class="nav-link btn btn-link" id="logoutBtn">Kijelentkezés</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <h1 class="mb-4">Admin Panel</h1>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card bg-darker mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Felhasználók</h5>
+          </div>
+          <div class="card-body">
+            <div id="usersList">
+              <div class="text-center text-white-50 py-5">
+                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                <p>Felhasználók betöltése...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card bg-darker mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Kérdések</h5>
+          </div>
+          <div class="card-body">
+            <div id="questionsList">
+              <div class="text-center text-white-50 py-5">
+                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                <p>Kérdések betöltése...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="src/auth.js"></script>
+  <script src="src/admin.js"></script>
+</body>
+</html>

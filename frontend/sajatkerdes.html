@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saját kérdések - Szavazzá GO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark position-relative navbar-glow">
+        <div class="navbar-flare"></div>
+        <div class="container-fluid d-flex flex-column align-items-center px-4">
+            <div class="w-100 d-flex justify-content-center py-2">
+                <a class="navbar-brand mx-0" href="index.html" aria-label="Főoldal">
+                    <img src="public/output.jpg" alt="Szavazzá GO logó" height="100" class="d-inline-block align-top logo-glow">
+                </a>
+            </div>
+            <div class="w-100 d-flex justify-content-between align-items-center nav-flex-row">
+                <div class="nav-left d-flex">
+                    <ul class="navbar-nav d-flex flex-row mb-0">
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow active" href="sajatkerdes.html">
+                                <i class="fas fa-question-circle pe-2"></i>Saját kérdések
+                            </a>
+                        </li>
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="toplista.html">
+                                <i class="fas fa-trophy pe-2"></i>Toplista
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-center d-flex justify-content-center">
+                    <ul class="navbar-nav d-flex flex-row mb-0">
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="index.html">
+                                <i class="fas fa-home pe-2"></i>Főoldal
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-right d-flex">
+                    <ul class="navbar-nav d-flex flex-row mb-0">
+                        <li class="nav-item px-3">
+                            <a class="nav-link hover-glow" href="gyik.html">
+                                <i class="fas fa-info-circle pe-2"></i>GYIK
+                            </a>
+                        </li>
+                        <li class="nav-item px-3" id="authNavItem">
+                            <button class="nav-link hover-glow btn btn-link" data-bs-toggle="modal" data-bs-target="#authModal">
+                                <i class="fas fa-sign-in-alt pe-2"></i>Bejelentkezés
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Saját kérdések</h1>
+        <div class="row mb-3">
+          <div class="col-md-6 mb-2 mb-md-0">
+            <select id="filterSelect" class="form-select">
+              <option value="all">Összes</option>
+              <option value="active">Aktív</option>
+              <option value="expired">Lejárt</option>
+              <option value="popular">Népszerű</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <select id="sortSelect" class="form-select">
+              <option value="newest">Legújabb</option>
+              <option value="oldest">Legrégebbi</option>
+              <option value="most-votes">Legtöbb szavazat</option>
+              <option value="most-likes">Legtöbb like</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="row mb-4">
+          <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card bg-darker p-3 rounded text-center">
+              <h3 id="totalUserQuestions">0</h3>
+              <p class="text-white-50 mb-0">Kérdés</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card bg-darker p-3 rounded text-center">
+              <h3 id="totalUserVotes">0</h3>
+              <p class="text-white-50 mb-0">Szavazat</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card bg-darker p-3 rounded text-center">
+              <h3 id="totalUserLikes">0</h3>
+              <p class="text-white-50 mb-0">Like</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 mb-3">
+            <div class="stat-card bg-darker p-3 rounded text-center">
+              <h3 id="activeUserQuestions">0</h3>
+              <p class="text-white-50 mb-0">Aktív</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Clear Filters -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <input type="text" id="searchInput" class="form-control" placeholder="Keresés...">
+          </div>
+        </div>
+
+        <!-- Empty States -->
+        <div id="emptyUserState" class="text-center py-5" style="display: none;">
+          <i class="fas fa-question-circle fa-3x mb-3 text-white-50"></i>
+          <h3 class="text-white">Még nincs kérdésed</h3>
+          <p class="text-white-50">Hozz létre egy új kérdést a főoldalon!</p>
+        </div>
+
+        <div id="noResultsState" class="text-center py-5" style="display: none;">
+          <i class="fas fa-search fa-3x mb-3 text-white-50"></i>
+          <h3 class="text-white">Nincs találat</h3>
+          <p class="text-white-50">Próbáld meg más szűrőkkel!</p>
+        </div>
+
+        <!-- Questions List -->
+        <div id="userQuestionsList" class="questions-grid own-questions">
+            <!-- Questions will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Auth Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bejelentkezés / Regisztráció</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs nav-fill mb-3" id="authTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Bejelentkezés</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Regisztráció</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="authTabContent">
+                        <!-- Login Form -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="loginUsername" class="form-label">Felhasználónév</label>
+                                    <input type="text" class="form-control bg-dark text-white border-secondary" id="loginUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loginPassword" class="form-label">Jelszó</label>
+                                    <input type="password" class="form-control bg-dark text-white border-secondary" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-create w-100">Bejelentkezés</button>
+                            </form>
+                        </div>
+                        <!-- Register Form -->
+                        <div class="tab-pane fade" id="register" role="tabpanel">
+                            <form id="registerForm">
+                                <div class="mb-3">
+                                    <label for="registerUsername" class="form-label">Felhasználónév</label>
+                                    <input type="text" class="form-control bg-dark text-white border-secondary" id="registerUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerPassword" class="form-label">Jelszó</label>
+                                    <input type="password" class="form-control bg-dark text-white border-secondary" id="registerPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Jelszó megerősítése</label>
+                                    <input type="password" class="form-control bg-dark text-white border-secondary" id="confirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-create w-100">Regisztráció</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="src/main.js"></script>
+    <script src="src/sajatkerdes.js"></script>
+</body>
+</html>

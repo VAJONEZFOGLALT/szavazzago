@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Szavazzá GO - Gyakran Ismételt Kérdések és Súgó">
+<link rel="stylesheet" href="src/style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="shortcut icon" href="public/output.jpg" type="image/x-icon">
+<title>GYIK - Szavazzá GO</title>
+</head>
+<body>
+<div class="d-flex flex-column min-vh-100">
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-dark position-relative navbar-glow">
+<div class="navbar-flare"></div>
+<div class="container-fluid d-flex flex-column align-items-center px-4">
+<div class="w-100 d-flex justify-content-center py-2">
+<a class="navbar-brand mx-0" href="index.html" aria-label="Főoldal">
+<img src="public/output.jpg" alt="Szavazzá GO logó" height="100" class="d-inline-block align-top logo-glow">
+</a>
+</div>
+<div class="w-100 d-flex justify-content-between align-items-center nav-flex-row">
+<div class="nav-left d-flex">
+<ul class="navbar-nav d-flex flex-row mb-0">
+<li class="nav-item px-3">
+<a class="nav-link hover-glow" href="sajatkerdes.html">
+<i class="fas fa-question-circle pe-2"></i>Saját kérdések
+</a>
+</li>
+<li class="nav-item px-3">
+<a class="nav-link hover-glow" href="toplista.html">
+<i class="fas fa-trophy pe-2"></i>Toplista
+</a>
+</li>
+</ul>
+</div>
+<div class="nav-center d-flex justify-content-center">
+<ul class="navbar-nav d-flex flex-row mb-0">
+<li class="nav-item px-3">
+<a class="nav-link hover-glow" href="index.html">
+<i class="fas fa-home pe-2"></i>Főoldal
+</a>
+</li>
+</ul>
+</div>
+<div class="nav-right d-flex">
+<ul class="navbar-nav d-flex flex-row mb-0">
+<li class="nav-item px-3">
+<a class="nav-link hover-glow active" href="gyik.html">
+<i class="fas fa-info-circle pe-2"></i>GYIK
+</a>
+</li>
+<li class="nav-item px-3" id="authNavItem">
+<button class="nav-link hover-glow btn btn-link" data-bs-toggle="modal" data-bs-target="#authModal">
+<i class="fas fa-sign-in-alt pe-2"></i>Bejelentkezés
+</button>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</nav>
+
+<!-- Main Content -->
+<main class="flex-grow-1" style="padding-top: 40px">
+<div class="container py-4">
+<div class="row">
+<div class="col-12">
+<h1 class="text-center text-white mb-4">
+<i class="fas fa-question-circle me-3 text-info"></i>Gyakran Ismételt Kérdések
+</h1>
+<p class="text-center text-white-50 mb-5">Minden, amit tudnod kell a Szavazzá GO használatáról</p>
+</div>
+</div>
+
+<!-- Quick Navigation -->
+<div class="row mb-5">
+<div class="col-md-10 mx-auto">
+<div class="card bg-darker border-primary">
+<div class="card-header bg-primary text-white">
+<h5 class="mb-0">
+<i class="fas fa-compass me-2"></i>Gyors navigáció
+</h5>
+</div>
+<div class="card-body">
+<div class="row">
+<div class="col-md-6 mb-3">
+<div class="quick-nav-item">
+<a href="#alapok" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-play-circle me-2 text-success"></i>Alapok és kezdés
+</a>
+</div>
+<div class="quick-nav-item">
+<a href="#kerdesek" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-question me-2 text-warning"></i>Kérdések létrehozása
+</a>
+</div>
+<div class="quick-nav-item">
+<a href="#szavazas" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-vote-yea me-2 text-info"></i>Szavazás és értékelés
+</a>
+</div>
+</div>
+<div class="col-md-6 mb-3">
+<div class="quick-nav-item">
+<a href="#fiok" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-user me-2 text-primary"></i>Fiókkezelés
+</a>
+</div>
+<div class="quick-nav-item">
+<a href="#szabalyok" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-gavel me-2 text-danger"></i>Szabályok és irányelvek
+</a>
+</div>
+<div class="quick-nav-item">
+<a href="#kapcsolat" class="text-white text-decoration-none hover-glow">
+<i class="fas fa-envelope me-2 text-secondary"></i>Kapcsolat és támogatás
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- FAQ Sections -->
+<div class="row">
+<div class="col-md-10 mx-auto">
+
+<!-- Alapok Section -->
+<section id="alapok" class="faq-section mb-5">
+<div class="card bg-darker border-success">
+<div class="card-header bg-success text-white">
+<h3 class="mb-0">
+<i class="fas fa-play-circle me-2"></i>Alapok és kezdés
+</h3>
+</div>
+<div class="card-body">
+<div class="accordion accordion-dark" id="alapokAccordion">
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#alapok1">
+Mi az a Szavazzá GO?
+</button>
+</h2>
+<div id="alapok1" class="accordion-collapse collapse show" data-bs-parent="#alapokAccordion">
+<div class="accordion-body text-white-50">
+A Szavazzá GO egy interaktív platform, ahol felhasználók kérdéseket tehetnek fel, válaszlehetőségeket adhatnak meg, és mások szavazhatnak ezekre. 
+Célja, hogy közösségi döntéshozatalt és véleménynyilvánítást tegyen lehetővé egy modern, felhasználóbarát felületen.
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#alapok2">
+Hogyan kezdjem el a használatot?
+</button>
+</h2>
+<div id="alapok2" class="accordion-collapse collapse" data-bs-parent="#alapokAccordion">
+<div class="accordion-body text-white-50">
+<ol>
+<li>Látogass el a <a href="index.html" class="text-primary">főoldalra</a></li>
+<li>Böngészd a meglévő kérdéseket és szavazz rájuk</li>
+<li>Hozz létre saját kérdést a jobb oldali űrlap segítségével</li>
+<li>Opcionálisan regisztrálj fiókot a további funkciókért</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#alapok3">
+Szükséges regisztrálnom?
+</button>
+</h2>
+<div id="alapok3" class="accordion-collapse collapse" data-bs-parent="#alapokAccordion">
+<div class="accordion-body text-white-50">
+Nem, a regisztráció nem kötelező! Vendégként is létrehozhatsz kérdéseket és szavazhatsz. 
+Azonban a regisztráció előnyei:
+<ul>
+<li>Saját kérdéseid nyomon követése</li>
+<li>Kérdések szerkesztése és törlése</li>
+<li>Részletes statisztikák</li>
+<li>Személyre szabott élmény</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Kérdések Section -->
+<section id="kerdesek" class="faq-section mb-5">
+<div class="card bg-darker border-warning">
+<div class="card-header bg-warning text-dark">
+<h3 class="mb-0">
+<i class="fas fa-question me-2"></i>Kérdések létrehozása
+</h3>
+</div>
+<div class="card-body">
+<div class="accordion accordion-dark" id="kerdesekAccordion">
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#kerdesek1">
+Hogyan hozok létre egy kérdést?
+</button>
+</h2>
+<div id="kerdesek1" class="accordion-collapse collapse show" data-bs-parent="#kerdesekAccordion">
+<div class="accordion-body text-white-50">
+<ol>
+<li>Menj a <a href="index.html" class="text-primary">főoldalra</a></li>
+<li>A jobb oldali "Létrehozás" panelben írd be a kérdésedet (max 200 karakter)</li>
+<li>Állítsd be a válaszok számát (2-4 között)</li>
+<li>Töltsd ki a válaszlehetőségeket (max 100 karakter/válasz)</li>
+<li>Adj hozzá címkéket (opcionális, max 5 db)</li>
+<li>Válaszd ki a lejárati időt</li>
+<li>Kattints a "KÉRDÉS LÉTREHOZÁSA" gombra</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#kerdesek2">
+Milyen korlátok vannak a kérdésekre?
+</button>
+</h2>
+<div id="kerdesek2" class="accordion-collapse collapse" data-bs-parent="#kerdesekAccordion">
+<div class="accordion-body text-white-50">
+<ul>
+<li><strong>Kérdés:</strong> Maximum 200 karakter</li>
+<li><strong>Válaszok:</strong> 2-4 darab, egyenként max 100 karakter</li>
+<li><strong>Címkék:</strong> Maximum 5 darab, egyenként max 15 karakter, szóköz nélkül</li>
+<li><strong>Lejárat:</strong> 1 nap, 3 nap, 1 hét, 1 hónap vagy soha</li>
+<li>A válaszok nem lehetnek azonosak</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#kerdesek3">
+Szerkeszthetem a kérdéseimet?
+</button>
+</h2>
+<div id="kerdesek3" class="accordion-collapse collapse" data-bs-parent="#kerdesekAccordion">
+<div class="accordion-body text-white-50">
+Igen! A <a href="sajatkerdes.html" class="text-primary">Saját kérdések</a> oldalon:
+<ul>
+<li>Szerkesztheted a kérdés szövegét</li>
+<li>Módosíthatod a válaszlehetőségeket</li>
+<li>Hozzáadhatsz vagy eltávolíthatsz címkéket</li>
+<li>Törölheted a kérdést (visszavonhatatlan!)</li>
+</ul>
+<strong>Figyelem:</strong> A lejárati időt és a válaszok számát nem lehet módosítani.
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#kerdesek4">
+Mik azok a címkék és mire jók?
+</button>
+</h2>
+<div id="kerdesek4" class="accordion-collapse collapse" data-bs-parent="#kerdesekAccordion">
+<div class="accordion-body text-white-50">
+A címkék kategorizálják a kérdéseket és megkönnyítik a keresést. Például:
+<ul>
+<li><code>#sport</code> - sporttal kapcsolatos kérdések</li>
+<li><code>#tech</code> - technológiai témák</li>
+<li><code>#film</code> - filmek, sorozatok</li>
+<li><code>#étel</code> - gasztronómia</li>
+</ul>
+A címkék alapján szűrhetsz a <a href="toplista.html" class="text-primary">Toplistán</a>.
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Szavazás Section -->
+<section id="szavazas" class="faq-section mb-5">
+<div class="card bg-darker border-info">
+<div class="card-header bg-info text-white">
+<h3 class="mb-0">
+<i class="fas fa-vote-yea me-2"></i>Szavazás és értékelés
+</h3>
+</div>
+<div class="card-body">
+<div class="accordion accordion-dark" id="szavazasAccordion">
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szavazas1">
+Hogyan szavazhatok?
+</button>
+</h2>
+<div id="szavazas1" class="accordion-collapse collapse show" data-bs-parent="#szavazasAccordion">
+<div class="accordion-body text-white-50">
+<ol>
+<li>Válassz egy kérdést a főoldalon</li>
+<li>Olvasd el a válaszlehetőségeket</li>
+<li>Kattints a "Szavaz" gombra a választott válasz mellett</li>
+<li>A szavazat azonnal rögzítésre kerül</li>
+</ol>
+<strong>Fontos:</strong> Kérdésenként csak egyszer szavazhatsz, és a szavazatot nem lehet megváltoztatni.
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szavazas2">
+Mi a különbség a szavazás és a like/dislike között?
+</button>
+</h2>
+<div id="szavazas2" class="accordion-collapse collapse" data-bs-parent="#szavazasAccordion">
+<div class="accordion-body text-white-50">
+<ul>
+<li><strong>Szavazás:</strong> Egy konkrét válaszra szavazol a kérdésben</li>
+<li><strong>Like/Dislike:</strong> Magát a kérdést értékeled (jó-e a kérdés, érdekes-e)</li>
+</ul>
+A like/dislike gombokat a kérdés jobb felső sarkában találod. Ezek befolyásolják a kérdés helyezését a toplistán.
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szavazas3">
+Láthatom az eredményeket szavazás előtt?
+</button>
+</h2>
+<div id="szavazas3" class="accordion-collapse collapse" data-bs-parent="#szavazasAccordion">
+<div class="accordion-body text-white-50">
+Nem, az eredmények csak szavazás után láthatók. Ez biztosítja, hogy a szavazatod ne legyen befolyásolva mások választásai által.
+Szavazás után látni fogod:
+<ul>
+<li>Az összes szavazat számát</li>
+<li>A saját választásodat kiemelve</li>
+<li>A kérdés like/dislike arányát</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Fiókkezelés Section -->
+<section id="fiok" class="faq-section mb-5">
+<div class="card bg-darker border-primary">
+<div class="card-header bg-primary text-white">
+<h3 class="mb-0">
+<i class="fas fa-user me-2"></i>Fiókkezelés
+</h3>
+</div>
+<div class="card-body">
+<div class="accordion accordion-dark" id="fiokAccordion">
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#fiok1">
+Hogyan regisztrálhatok?
+</button>
+</h2>
+<div id="fiok1" class="accordion-collapse collapse show" data-bs-parent="#fiokAccordion">
+<div class="accordion-body text-white-50">
+<ol>
+<li>Kattints a "Bejelentkezés" gombra a navigációs sávban</li>
+<li>Válaszd a "Regisztráció" fület</li>
+<li>Töltsd ki az űrlapot:
+<ul>
+<li>Felhasználónév (3-20 karakter)</li>
+<li>Email cím</li>
+<li>Jelszó (min. 6 karakter)</li>
+<li>Jelszó megerősítése</li>
+</ul>
+</li>
+<li>Fogadd el a felhasználási feltételeket</li>
+<li>Kattints a "Regisztráció" gombra</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#fiok2">
+Elfelejtettem a jelszavam, mit tegyek?
+</button>
+</h2>
+<div id="fiok2" class="accordion-collapse collapse" data-bs-parent="#fiokAccordion">
+<div class="accordion-body text-white-50">
+<ol>
+<li>Kattints a "Bejelentkezés" gombra</li>
+<li>Válaszd az "Elfelejtett jelszó?" linket</li>
+<li>Add meg az email címedet</li>
+<li>Elküldünk egy jelszó-visszaállító linket</li>
+<li>Kövesd az emailben kapott utasításokat</li>
+</ol>
+<strong>Tipp:</strong> Ellenőrizd a spam mappát is!
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#fiok3">
+Törölhetem a fiókomat?
+</button>
+</h2>
+<div id="fiok3" class="accordion-collapse collapse" data-bs-parent="#fiokAccordion">
+<div class="accordion-body text-white-50">
+Igen, de ez jelenleg csak támogatási kéréssel lehetséges. 
+<a href="#kapcsolat" class="text-primary">Vedd fel velünk a kapcsolatot</a> és segítünk a fiók törlésében.
+<br><br>
+<strong>Figyelem:</strong> A fiók törlése visszavonhatatlan és minden adatod elvész!
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Szabályok Section -->
+<section id="szabalyok" class="faq-section mb-5">
+<div class="card bg-darker border-danger">
+<div class="card-header bg-danger text-white">
+<h3 class="mb-0">
+<i class="fas fa-gavel me-2"></i>Szabályok és irányelvek
+</h3>
+</div>
+<div class="card-body">
+<div class="accordion accordion-dark" id="szabalyokAccordion">
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szabalyok1">
+Milyen kérdéseket tehetek fel?
+</button>
+</h2>
+<div id="szabalyok1" class="accordion-collapse collapse show" data-bs-parent="#szabalyokAccordion">
+<div class="accordion-body text-white-50">
+<strong>Megengedett kérdések:</strong>
+<ul>
+<li>Véleménykutatások</li>
+<li>Szórakoztató kérdések</li>
+<li>Oktatási célú felmérések</li>
+<li>Közösségi döntések</li>
+<li>Általános érdeklődésre számot tartó témák</li>
+</ul>
+<strong>Tilos:</strong>
+<ul>
+<li>Sértő, gyűlöletkeltő tartalom</li>
+<li>Személyes adatok kérése</li>
+<li>Illegális tevékenységek</li>
+<li>Spam vagy reklám</li>
+<li>Szerzői jogokat sértő tartalom</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szabalyok2">
+Mi történik, ha megszegem a szabályokat?
+</button>
+</h2>
+<div id="szabalyok2" class="accordion-collapse collapse" data-bs-parent="#szabalyokAccordion">
+<div class="accordion-body text-white-50">
+A szabálysértés súlyosságától függően:
+<ol>
+<li><strong>Figyelmeztetés</strong> - első alkalommal</li>
+<li><strong>Kérdés törlése</strong> - szabálysértő tartalom esetén</li>
+<li><strong>Ideiglenes tiltás</strong> - ismételt szabálysértés</li>
+<li><strong>Végleges tiltás</strong> - súlyos vagy folyamatos szabálysértés</li>
+</ol>
+Minden esetben email értesítést küldünk a döntésről.
+</div>
+</div>
+</div>
+
+<div class="accordion-item bg-darker border-secondary">
+<h2 class="accordion-header">
+<button class="accordion-button collapsed bg-darker text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#szabalyok3">
+Hogyan jelenthetem be a szabálysértő tartalmat?
+</button>
+</h2>
+<div id="szabalyok3" class="accordion-collapse collapse" data-bs-parent="#szabalyokAccordion">
+<div class="accordion-body text-white-50">
+Jelenleg email útján tudsz bejelentést tenni:
+<ul>
+<li>Küldj emailt a <strong>report@szavazzago.hu</strong> címre</li>
+<li>Add meg a kérdés ID-ját vagy linkjét</li>
+<li>Írd le a problémát</li>
+<li>24 órán belül válaszolunk</li>
+</ul>
+Hamarosan beépített jelentési rendszert is bevezetünk.
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Kapcsolat Section -->
+<section id="kapcsolat" class="faq-section mb-5">
+<div class="card bg-darker border-secondary">
+<div class="card-header bg-secondary text-white">
+<h3 class="mb-0">
+<i class="fas fa-envelope me-2"></i>Kapcsolat és támogatás
+</h3>
+</div>
+<div class="card-body">
+<div class="row">
+<div class="col-md-6 mb-4">
+<h5 class="text-white mb-3">
+<i class="fas fa-headset me-2 text-info"></i>Támogatás
+</h5>
+<div class="contact-info">
+<p class="text-white-50 mb-2">
+<i class="fas fa-envelope me-2"></i>
+<strong>Email:</strong> support@szavazzago.hu
+</p>
+<p class="text-white-50 mb-2">
+<i class="fas fa-clock me-2"></i>
+<strong>Válaszidő:</strong> 24-48 óra
+</p>
+<p class="text-white-50 mb-3">
+<i class="fas fa-language me-2"></i>
+<strong>Nyelvek:</strong> Magyar, Angol
+</p>
+<a href="mailto:support@szavazzago.hu" class="btn btn-outline-info hover-glow">
+<i class="fas fa-paper-plane me-2"></i>Email küldése
+</a>
+</div>
+</div>
+<div class="col-md-6 mb-4">
+<h5 class="text-white mb-3">
+<i class="fas fa-share-alt me-2 text-primary"></i>Közösségi média
+</h5>
+<div class="social-links">
+<a href="#" class="btn btn-outline-primary me-2 mb-2 hover-glow">
+<i class="fab fa-facebook-f me-2"></i>Facebook
+</a>
+<a href="#" class="btn btn-outline-info me-2 mb-2 hover-glow">
+<i class="fab fa-twitter me-2"></i>Twitter
+</a>
+<a href="#" class="btn btn-outline-danger me-2 mb-2 hover-glow">
+<i class="fab fa-instagram me-2"></i>Instagram
+</a>
+<a href="#" class="btn btn-outline-secondary me-2 mb-2 hover-glow">
+<i class="fab fa-discord me-2"></i>Discord
+</a>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-12">
+<div class="alert alert-info">
+<i class="fas fa-lightbulb me-2"></i>
+<strong>Tipp:</strong> Mielőtt kapcsolatba lépnél velünk, nézd át ezt a GYIK oldalt - 
+lehet, hogy már megtalálod a választ a kérdésedre!
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+</div>
+
+<!-- Additional Info -->
+<div class="row mt-5">
+<div class="col-md-10 mx-auto">
+<div class="card bg-darker border-warning">
+<div class="card-body text-center">
+<h4 class="text-white mb-3">
+<i class="fas fa-rocket me-2 text-warning"></i>Újdonságok és frissítések
+</h4>
+<p class="text-white-50 mb-3">
+Kövess minket a közösségi médiában, hogy elsőként értesülj az új funkciókról és frissítésekről!
+</p>
+<div class="row">
+<div class="col-md-4 mb-3">
+<div class="feature-preview">
+<i class="fas fa-mobile-alt fa-2x text-primary mb-2"></i>
+<h6 class="text-white">Mobil alkalmazás</h6>
+<small class="text-white-50">Hamarosan iOS és Android verzió</small>
+</div>
+</div>
+<div class="col-md-4 mb-3">
+<div class="feature-preview">
+<i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+<h6 class="text-white">Részletes statisztikák</h6>
+<small class="text-white-50">Még több adat a kérdéseidről</small>
+</div>
+</div>
+<div class="col-md-4 mb-3">
+<div class="feature-preview">
+<i class="fas fa-users fa-2x text-info mb-2"></i>
+<h6 class="text-white">Csoportok</h6>
+<small class="text-white-50">Privát kérdések barátoknak</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="text-center text-white mt-auto footer-glow">
+<div class="footer-flare"></div>
+<div class="container pt-4">
+<div class="row justify-content-center g-3">
+<div class="col-6 col-md-auto">
+<a href="index.html" class="text-white text-decoration-none hover-glow">Kezdőlap</a>
+</div>
+<div class="col-6 col-md-auto">
+<a href="sajatkerdes.html" class="text-white text-decoration-none hover-glow">Saját kérdések</a>
+</div>
+<div class="col-6 col-md-auto">
+<a href="toplista.html" class="text-white text-decoration-none hover-glow">Toplista</a>
+</div>
+<div class="col-6 col-md-auto">
+<a href="gyik.html" class="text-white text-decoration-none hover-glow">GYIK</a>
+</div>
+</div>
+<hr class="my-3 mx-auto" style="max-width: 800px; border-color: #444;">
+<div class="pb-3 text-center">
+<a href="https://open.spotify.com/track/0126WdGxnrNEqzgUb1wgQH?si=b6bee61851234d29"
+class="text-white text-decoration-none hover-glow surprise-link"
+target="_blank" rel="noopener noreferrer">
+<i class="fas fa-gift me-2"></i>SURPRISE ME
+</a>
+</div>
+</div>
+<div class="footer-bottom py-3">
+<div class="container">
+<div class="row align-items-center">
+<div class="col-md-12 text-center">
+© 2025 Copyright:
+<a class="text-white fw-bold hover-glow" href="https://r33b.net/">Szavazzá GO</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+
+<!-- Admin Access Button -->
+<a href="admin.html" class="admin-btn btn btn-danger hover-glow" id="adminAccessBtn">
+<i class="fas fa-lock"></i>
+</a>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+<script src="src/main.js"></script>
+
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bejelentkezés / Regisztráció</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs nav-fill mb-3" id="authTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Bejelentkezés</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Regisztráció</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="authTabContent">
+                    <!-- Login Form -->
+                    <div class="tab-pane fade show active" id="login" role="tabpanel">
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="loginUsername" class="form-label">Felhasználónév</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="loginUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Jelszó</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-create w-100">Bejelentkezés</button>
+                        </form>
+                    </div>
+                    <!-- Register Form -->
+                    <div class="tab-pane fade" id="register" role="tabpanel">
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="registerUsername" class="form-label">Felhasználónév</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="registerUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">Jelszó</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="registerPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Jelszó megerősítése</label>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-create w-100">Regisztráció</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>
