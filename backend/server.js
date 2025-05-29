@@ -509,9 +509,9 @@ app.get('/api/questions/:id/reactions', (req, res) => {
                 console.error('Error fetching reactions:', err);
                 return res.status(500).json({ error: 'Failed to fetch reactions' });
             }
-            const result = { like: 0, dislike: 0 };
-            result.rows.forEach(r => { result[r.reaction] = r.count; });
-            res.json(result);
+            const counts = { like: 0, dislike: 0 };
+            result.rows.forEach(r => { counts[r.reaction] = r.count; });
+            res.json(counts);
         }
     );
 });
