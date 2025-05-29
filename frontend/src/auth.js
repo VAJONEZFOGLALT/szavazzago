@@ -1,5 +1,5 @@
 // Constants
-const API_BASE_URL = "http://localhost:3000/api"
+const API_BASE_URL = "https://szavazzago.onrender.com/api"
 let initializationAttempts = 0
 const MAX_INIT_ATTEMPTS = 3
 const INIT_RETRY_DELAY = 2000 // 2 seconds
@@ -35,7 +35,7 @@ class AuthManager {
 
     try {
       if (this.token) {
-        const response = await fetch('http://localhost:3000/api/auth/verify', {
+        const response = await fetch(`${API_BASE_URL}/auth/verify`, {
           headers: { 'Authorization': `Bearer ${this.token}` }
         })
         
@@ -64,7 +64,7 @@ class AuthManager {
   async login(username, password) {
     console.log('Attempting login for user:', username)
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -87,7 +87,7 @@ class AuthManager {
   async register(username, email, password) {
     console.log('Attempting registration for user:', username)
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })

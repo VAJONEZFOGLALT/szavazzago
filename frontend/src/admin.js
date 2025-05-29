@@ -18,14 +18,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAdminData() {
   try {
     // Load users
-    const usersResponse = await fetch('http://localhost:3000/api/admin/users', {
+    const usersResponse = await fetch('https://szavazzago.onrender.com/api/admin/users', {
       headers: window.authManager.getAuthHeaders()
     });
     const users = await usersResponse.json();
     renderUsers(users);
 
     // Load questions
-    const questionsResponse = await fetch('http://localhost:3000/api/admin/questions', {
+    const questionsResponse = await fetch('https://szavazzago.onrender.com/api/admin/questions', {
       headers: window.authManager.getAuthHeaders()
     });
     const questions = await questionsResponse.json();
@@ -100,7 +100,7 @@ async function toggleAdmin(userId, makeAdmin) {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/admin/users/${userId}/toggle-admin`, {
+    const response = await fetch(`https://szavazzago.onrender.com/api/admin/users/${userId}/toggle-admin`, {
       method: 'POST',
       headers: {
         ...window.authManager.getAuthHeaders(),
@@ -127,7 +127,7 @@ async function deleteUser(userId) {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`, {
+    const response = await fetch(`https://szavazzago.onrender.com/api/admin/users/${userId}`, {
       method: 'DELETE',
       headers: window.authManager.getAuthHeaders()
     });
@@ -150,7 +150,7 @@ async function deleteQuestion(questionId) {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/admin/questions/${questionId}`, {
+    const response = await fetch(`https://szavazzago.onrender.com/api/admin/questions/${questionId}`, {
       method: 'DELETE',
       headers: window.authManager.getAuthHeaders()
     });

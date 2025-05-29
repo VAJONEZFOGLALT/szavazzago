@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    fetch('http://localhost:3000/api/questions/user', {
+    fetch('https://szavazzago.onrender.com/api/questions/user', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -402,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:3000/api/questions/${questionId}`, {
+    fetch(`https://szavazzago.onrender.com/api/questions/${questionId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`

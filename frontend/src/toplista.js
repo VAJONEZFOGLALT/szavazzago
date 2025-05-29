@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Constants
   const STORAGE_KEY = "szavazza-go-questions"
-  const API_BASE_URL = "http://localhost:3000/api"
+  const API_BASE_URL = "https://szavazzago.onrender.com/api"
 
   // DOM Elements
   const elements = {

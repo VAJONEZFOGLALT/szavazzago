@@ -2,7 +2,7 @@
 const MAX_QUESTION_LENGTH = 200;
 const MAX_ANSWER_LENGTH = 100;
 const MAX_TAG_LENGTH = 15;
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "https://szavazzago.onrender.com/api";
 
 // State management
 let state = {
