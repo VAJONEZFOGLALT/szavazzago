@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && npm run copy-html",
+    "preview": "vite preview",
+    "copy-html": "copy index.html dist\\index.html && copy sajatkerdes.html dist\\sajatkerdes.html && copy toplista.html dist\\toplista.html && copy gyik.html dist\\gyik.html && copy admin.html dist\\admin.html"
   },
   "devDependencies": {
     "vite": "^6.3.5"
