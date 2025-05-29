@@ -302,6 +302,8 @@ async function voteOnQuestion(questionId, answerId) {
     }
 }
 
+window.voteOnQuestion = voteOnQuestion;
+
 async function loadQuestions() {
     try {
         const response = await fetch(`${API_BASE_URL}/questions`);

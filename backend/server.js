@@ -21,6 +21,29 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
+// Move getAnswersAndVotes to top-level scope
+const getAnswersAndVotes = (questionId) => {
+    return new Promise((resolve, reject) => {
+        pool.query(`
+            SELECT 
+                a.id,
+                a.text,
+                COUNT(v.id) as votes
+            FROM answers a
+            LEFT JOIN votes v ON a.id = v.answer_id
+            WHERE a.question_id = $1
+            GROUP BY a.id
+        `, [questionId], (err, result) => {
+            if (err) reject(err);
+            else resolve(result.rows.map(row => ({
+                id: row.id,
+                text: row.text,
+                votes: row.votes
+            })));
+        });
+    });
+};
+
 async function createTables() {
   // Users
   await pool.query(`
@@ -153,30 +176,7 @@ app.get('/api/questions', (req, res) => {
             return;
         }
 
-        // For each question, get its answers and votes
-        const getAnswersAndVotes = (questionId) => {
-            return new Promise((resolve, reject) => {
-                pool.query(`
-                    SELECT 
-                        a.id,
-                        a.text,
-                        COUNT(v.id) as votes
-                    FROM answers a
-                    LEFT JOIN votes v ON a.id = v.answer_id
-                    WHERE a.question_id = $1
-                    GROUP BY a.id
-                `, [questionId], (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result.rows.map(row => ({
-                        id: row.id,
-                        text: row.text,
-                        votes: row.votes
-                    })));
-                });
-            });
-        };
-
-        // Process all questions with their answers
+        // Use top-level getAnswersAndVotes
         Promise.all(result.rows.map(async (question) => {
             const answers = await getAnswersAndVotes(question.id);
             return {
