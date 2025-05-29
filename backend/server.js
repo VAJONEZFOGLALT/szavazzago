@@ -1,10 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { Pool } = require('pg');
 
 const app = express();
 const port = 3000;
@@ -16,59 +15,65 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Database setup
-const db = new sqlite3.Database('szavazza.db', (err) => {
-    if (err) {
-        console.error('Error opening database:', err);
-    } else {
-        console.log('Connected to SQLite database');
-        // Create tables if they don't exist
-        db.serialize(() => {
-            // Create tables with proper schema if they don't exist
-            db.run(`CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )`);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
-            db.run(`CREATE TABLE IF NOT EXISTS questions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                user_id INTEGER,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )`);
+async function createTables() {
+  // Users
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  // Questions
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS questions (
+      id SERIAL PRIMARY KEY,
+      text TEXT NOT NULL,
+      user_id INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  // Answers
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS answers (
+      id SERIAL PRIMARY KEY,
+      question_id INTEGER REFERENCES questions(id),
+      text TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  // Votes
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS votes (
+      id SERIAL PRIMARY KEY,
+      question_id INTEGER REFERENCES questions(id),
+      answer_id INTEGER REFERENCES answers(id),
+      user_id INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  // Question reactions
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS question_reactions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      question_id INTEGER REFERENCES questions(id),
+      reaction TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  console.log('PostgreSQL tables ensured');
+}
 
-            db.run(`CREATE TABLE IF NOT EXISTS answers (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                question_id INTEGER,
-                text TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (question_id) REFERENCES questions(id)
-            )`);
-
-            db.run(`CREATE TABLE IF NOT EXISTS votes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                question_id INTEGER,
-                answer_id INTEGER,
-                user_id INTEGER,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (question_id) REFERENCES questions(id),
-                FOREIGN KEY (answer_id) REFERENCES answers(id),
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )`);
-
-            db.run(`CREATE TABLE IF NOT EXISTS question_reactions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER,
-                question_id INTEGER,
-                reaction TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id),
-                FOREIGN KEY (question_id) REFERENCES questions(id)
-            )`);
-        });
-    }
+createTables().catch(err => {
+  console.error('Error creating tables:', err);
+  process.exit(1);
 });
 
 // Auth middleware
@@ -90,11 +95,11 @@ app.post('/api/auth/register', (req, res) => {
         return res.status(400).json({ error: 'Username and password required' });
     }
     const hash = bcrypt.hashSync(password, 10);
-    db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash], function(err) {
+    pool.query('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id', [username, hash], (err, result) => {
         if (err) {
             return res.status(400).json({ error: 'Username already exists' });
         }
-        const user = { id: this.lastID, username };
+        const user = { id: result.rows[0].id, username };
         const token = jwt.sign(user, JWT_SECRET);
         res.json({ token, user });
     });
@@ -106,10 +111,11 @@ app.post('/api/auth/login', (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password required' });
     }
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
-        if (err || !user) {
+    pool.query('SELECT * FROM users WHERE username = $1', [username], (err, result) => {
+        if (err || result.rows.length === 0) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
+        const user = result.rows[0];
         if (!bcrypt.compareSync(password, user.password)) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
@@ -121,7 +127,7 @@ app.post('/api/auth/login', (req, res) => {
 // Get all questions
 app.get('/api/questions', (req, res) => {
     // First get all questions with like/dislike counts
-    db.all(`
+    pool.query(`
         SELECT 
             q.id,
             q.text,
@@ -139,7 +145,7 @@ app.get('/api/questions', (req, res) => {
             GROUP BY question_id
         ) qr ON qr.question_id = q.id
         ORDER BY q.created_at DESC
-    `, [], (err, questions) => {
+    `, [], (err, result) => {
         if (err) {
             console.error('Error fetching questions:', err);
             res.status(500).json({ error: 'Failed to fetch questions' });
@@ -149,32 +155,32 @@ app.get('/api/questions', (req, res) => {
         // For each question, get its answers and votes
         const getAnswersAndVotes = (questionId) => {
             return new Promise((resolve, reject) => {
-                db.all(`
+                pool.query(`
                     SELECT 
                         a.id,
                         a.text,
                         COUNT(v.id) as votes
                     FROM answers a
                     LEFT JOIN votes v ON a.id = v.answer_id
-                    WHERE a.question_id = ?
+                    WHERE a.question_id = $1
                     GROUP BY a.id
-                `, [questionId], (err, answers) => {
+                `, [questionId], (err, result) => {
                     if (err) reject(err);
-                    else resolve(answers);
+                    else resolve(result.rows.map(row => ({
+                        id: row.id,
+                        text: row.text,
+                        votes: row.votes
+                    })));
                 });
             });
         };
 
         // Process all questions with their answers
-        Promise.all(questions.map(async (question) => {
+        Promise.all(result.rows.map(async (question) => {
             const answers = await getAnswersAndVotes(question.id);
             return {
                 ...question,
-                answers: answers.map(answer => ({
-                    id: answer.id,
-                    text: answer.text,
-                    votes: answer.votes
-                }))
+                answers: answers
             };
         }))
         .then(questionsWithAnswers => {
@@ -189,7 +195,7 @@ app.get('/api/questions', (req, res) => {
 
 // Get user questions
 app.get('/api/questions/user', authenticateToken, (req, res) => {
-    db.all(`
+    pool.query(`
         SELECT 
             q.id,
             q.text,
@@ -214,9 +220,9 @@ app.get('/api/questions/user', authenticateToken, (req, res) => {
             FROM question_reactions
             GROUP BY question_id
         ) qr ON qr.question_id = q.id
-        WHERE q.user_id = ?
+        WHERE q.user_id = $1
         ORDER BY q.created_at DESC
-    `, [req.user.id], async (err, questions) => {
+    `, [req.user.id], async (err, result) => {
         if (err) {
             console.error('Error fetching user questions:', err);
             res.status(500).json({ error: 'Failed to fetch user questions' });
@@ -225,8 +231,8 @@ app.get('/api/questions/user', authenticateToken, (req, res) => {
 
         // Get answers for each question
         try {
-            const questionsWithAnswers = await Promise.all(questions.map(async (question) => {
-                const answers = await getAnswersForQuestion(question.id);
+            const questionsWithAnswers = await Promise.all(result.rows.map(async (question) => {
+                const answers = await getAnswersAndVotes(question.id);
                 return {
                     ...question,
                     answers
@@ -247,29 +253,29 @@ app.post('/api/questions', authenticateToken, (req, res) => {
         return res.status(400).json({ error: 'Question text and at least two answers are required' });
     }
 
-    db.run('INSERT INTO questions (text, user_id) VALUES (?, ?)', [text, req.user.id], function(err) {
+    pool.query('INSERT INTO questions (text, user_id) VALUES ($1, $2) RETURNING id', [text, req.user.id], (err, result) => {
         if (err) {
             console.error('Error creating question:', err);
             return res.status(500).json({ error: 'Failed to create question' });
         }
 
-        const questionId = this.lastID;
-        const stmt = db.prepare('INSERT INTO answers (question_id, text) VALUES (?, ?)');
+        const questionId = result.rows[0].id;
+        const stmt = pool.query('INSERT INTO answers (question_id, text) VALUES ($1, $2) RETURNING id', answers.map((text, index) => [questionId, text]));
         
-        answers.forEach(answer => {
-            stmt.run(questionId, answer);
-        });
-        
-        stmt.finalize();
-
-        res.status(201).json({
-            id: questionId,
-            text,
-            answers: answers.map((text, index) => ({
-                id: index + 1,
+        stmt.then(result => {
+            res.status(201).json({
+                id: questionId,
                 text,
-                votes: 0
-            }))
+                answers: result.rows.map((row) => ({
+                    id: row.id,
+                    text: row.text,
+                    votes: 0
+                }))
+            });
+        })
+        .catch(err => {
+            console.error('Error inserting answers:', err);
+            res.status(500).json({ error: 'Failed to insert answers' });
         });
     });
 });
@@ -284,26 +290,24 @@ app.post('/api/questions/:id/vote', authenticateToken, (req, res) => {
     }
 
     // Check if user has already voted on this question
-    db.get('SELECT * FROM votes WHERE question_id = ? AND user_id = ?', [questionId, req.user.id], (err, vote) => {
+    pool.query('SELECT * FROM votes WHERE question_id = $1 AND user_id = $2', [questionId, req.user.id], (err, result) => {
         if (err) {
             console.error('Error checking vote:', err);
             return res.status(500).json({ error: 'Failed to check vote' });
         }
 
-        if (vote) {
+        if (result.rows.length > 0) {
             return res.status(400).json({ error: 'You have already voted on this question' });
         }
 
         // Record the vote
-        db.run('INSERT INTO votes (question_id, answer_id, user_id) VALUES (?, ?, ?)',
-            [questionId, answerId, req.user.id],
-            function(err) {
-                if (err) {
-                    console.error('Error recording vote:', err);
-                    return res.status(500).json({ error: 'Failed to record vote' });
-                }
-                res.json({ success: true });
-            });
+        pool.query('INSERT INTO votes (question_id, answer_id, user_id) VALUES ($1, $2, $3)', [questionId, answerId, req.user.id], (err) => {
+            if (err) {
+                console.error('Error recording vote:', err);
+                return res.status(500).json({ error: 'Failed to record vote' });
+            }
+            res.json({ success: true });
+        });
     });
 });
 
@@ -312,36 +316,36 @@ app.delete('/api/questions/:id', authenticateToken, (req, res) => {
     const questionId = req.params.id;
 
     // First check if the question belongs to the user
-    db.get('SELECT user_id FROM questions WHERE id = ?', [questionId], (err, question) => {
+    pool.query('SELECT user_id FROM questions WHERE id = $1', [questionId], (err, result) => {
         if (err) {
             console.error('Error checking question ownership:', err);
             return res.status(500).json({ error: 'Failed to check question ownership' });
         }
 
-        if (!question) {
+        if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Question not found' });
         }
 
-        if (question.user_id !== req.user.id) {
+        if (result.rows[0].user_id !== req.user.id) {
             return res.status(403).json({ error: 'Not authorized to delete this question' });
         }
 
         // Delete votes first (due to foreign key constraints)
-        db.run('DELETE FROM votes WHERE question_id = ?', [questionId], (err) => {
+        pool.query('DELETE FROM votes WHERE question_id = $1', [questionId], (err) => {
             if (err) {
                 console.error('Error deleting votes:', err);
                 return res.status(500).json({ error: 'Failed to delete votes' });
             }
 
             // Delete answers
-            db.run('DELETE FROM answers WHERE question_id = ?', [questionId], (err) => {
+            pool.query('DELETE FROM answers WHERE question_id = $1', [questionId], (err) => {
                 if (err) {
                     console.error('Error deleting answers:', err);
                     return res.status(500).json({ error: 'Failed to delete answers' });
                 }
 
                 // Finally delete the question
-                db.run('DELETE FROM questions WHERE id = ?', [questionId], (err) => {
+                pool.query('DELETE FROM questions WHERE id = $1', [questionId], (err) => {
                     if (err) {
                         console.error('Error deleting question:', err);
                         return res.status(500).json({ error: 'Failed to delete question' });
@@ -363,105 +367,105 @@ app.put('/api/questions/:id', authenticateToken, (req, res) => {
     }
 
     // First check if the question belongs to the user
-    db.get('SELECT user_id FROM questions WHERE id = ?', [questionId], (err, question) => {
+    pool.query('SELECT user_id FROM questions WHERE id = $1', [questionId], (err, result) => {
         if (err) {
             console.error('Error checking question ownership:', err);
             return res.status(500).json({ error: 'Failed to check question ownership' });
         }
 
-        if (!question) {
+        if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Question not found' });
         }
 
-        if (question.user_id !== req.user.id) {
+        if (result.rows[0].user_id !== req.user.id) {
             return res.status(403).json({ error: 'Not authorized to update this question' });
         }
 
         // Start a transaction
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION');
+        pool.query('BEGIN', (err) => {
+            if (err) {
+                console.error('Error starting transaction:', err);
+                return res.status(500).json({ error: 'Failed to start transaction' });
+            }
 
             // Update question text
-            db.run('UPDATE questions SET text = ? WHERE id = ?', [text, questionId], (err) => {
+            pool.query('UPDATE questions SET text = $1 WHERE id = $2', [text, questionId], (err) => {
                 if (err) {
                     console.error('Error updating question:', err);
-                    db.run('ROLLBACK');
+                    pool.query('ROLLBACK', (err) => {
+                        if (err) console.error('Error rolling back:', err);
+                    });
                     return res.status(500).json({ error: 'Failed to update question' });
                 }
 
                 // Delete existing answers
-                db.run('DELETE FROM answers WHERE question_id = ?', [questionId], (err) => {
+                pool.query('DELETE FROM answers WHERE question_id = $1', [questionId], (err) => {
                     if (err) {
                         console.error('Error deleting old answers:', err);
-                        db.run('ROLLBACK');
+                        pool.query('ROLLBACK', (err) => {
+                            if (err) console.error('Error rolling back:', err);
+                        });
                         return res.status(500).json({ error: 'Failed to update answers' });
                     }
 
                     // Insert new answers
-                    const stmt = db.prepare('INSERT INTO answers (question_id, text) VALUES (?, ?)');
-                    let hasError = false;
-
-                    answers.forEach(answer => {
-                        stmt.run(questionId, answer, (err) => {
-                            if (err) {
-                                console.error('Error inserting new answer:', err);
-                                hasError = true;
-                            }
-                        });
-                    });
-
-                    stmt.finalize();
-
-                    if (hasError) {
-                        db.run('ROLLBACK');
-                        return res.status(500).json({ error: 'Failed to update answers' });
-                    }
-
-                    db.run('COMMIT', (err) => {
-                        if (err) {
-                            console.error('Error committing transaction:', err);
-                            return res.status(500).json({ error: 'Failed to update question' });
+                    const stmt = pool.query('INSERT INTO answers (question_id, text) VALUES ($1, $2) RETURNING id', answers.map((text, index) => [questionId, text]));
+                    
+                    stmt.then(result => {
+                        if (result.rows.length !== answers.length) {
+                            console.error('Error inserting new answers:', result.rows.length);
+                            pool.query('ROLLBACK', (err) => {
+                                if (err) console.error('Error rolling back:', err);
+                            });
+                            return res.status(500).json({ error: 'Failed to insert answers' });
                         }
 
-                        // Get the updated question with answers
-                        db.get(`
-                            SELECT 
-                                q.id,
-                                q.text,
-                                q.created_at,
-                                u.username as author
-                            FROM questions q
-                            LEFT JOIN users u ON q.user_id = u.id
-                            WHERE q.id = ?
-                        `, [questionId], (err, question) => {
+                        pool.query('COMMIT', (err) => {
                             if (err) {
-                                console.error('Error fetching updated question:', err);
-                                return res.status(500).json({ error: 'Failed to fetch updated question' });
+                                console.error('Error committing transaction:', err);
+                                return res.status(500).json({ error: 'Failed to commit transaction' });
                             }
 
-                            // Get answers with vote counts
-                            db.all(`
+                            // Get the updated question with answers
+                            pool.query(`
                                 SELECT 
-                                    a.id,
-                                    a.text,
-                                    COUNT(v.id) as votes
-                                FROM answers a
-                                LEFT JOIN votes v ON a.id = v.answer_id
-                                WHERE a.question_id = ?
-                                GROUP BY a.id
-                            `, [questionId], (err, answers) => {
+                                    q.id,
+                                    q.text,
+                                    q.created_at,
+                                    u.username as author
+                                FROM questions q
+                                LEFT JOIN users u ON q.user_id = u.id
+                                WHERE q.id = $1
+                            `, [questionId], (err, result) => {
                                 if (err) {
-                                    console.error('Error fetching answers:', err);
-                                    return res.status(500).json({ error: 'Failed to fetch answers' });
+                                    console.error('Error fetching updated question:', err);
+                                    return res.status(500).json({ error: 'Failed to fetch updated question' });
                                 }
 
-                                res.json({
-                                    ...question,
-                                    answers: answers.map(answer => ({
-                                        id: answer.id,
-                                        text: answer.text,
-                                        votes: answer.votes
-                                    }))
+                                // Get answers with vote counts
+                                pool.query(`
+                                    SELECT 
+                                        a.id,
+                                        a.text,
+                                        COUNT(v.id) as votes
+                                    FROM answers a
+                                    LEFT JOIN votes v ON a.id = v.answer_id
+                                    WHERE a.question_id = $1
+                                    GROUP BY a.id
+                                `, [questionId], (err, result) => {
+                                    if (err) {
+                                        console.error('Error fetching answers:', err);
+                                        return res.status(500).json({ error: 'Failed to fetch answers' });
+                                    }
+
+                                    res.json({
+                                        ...result.rows[0],
+                                        answers: result.rows.map(row => ({
+                                            id: row.id,
+                                            text: row.text,
+                                            votes: row.votes
+                                        }))
+                                    });
                                 });
                             });
                         });
@@ -480,11 +484,11 @@ app.post('/api/questions/:id/react', authenticateToken, (req, res) => {
         return res.status(400).json({ error: 'Invalid reaction' });
     }
     // Upsert reaction
-    db.run(
-        `INSERT INTO question_reactions (user_id, question_id, reaction) VALUES (?, ?, ?)
+    pool.query(
+        `INSERT INTO question_reactions (user_id, question_id, reaction) VALUES ($1, $2, $3)
          ON CONFLICT(user_id, question_id) DO UPDATE SET reaction = excluded.reaction`,
         [req.user.id, questionId, reaction],
-        function (err) {
+        (err) => {
             if (err) {
                 console.error('Error recording reaction:', err);
                 return res.status(500).json({ error: 'Failed to record reaction' });
@@ -497,16 +501,16 @@ app.post('/api/questions/:id/react', authenticateToken, (req, res) => {
 // Get like/dislike counts for a question
 app.get('/api/questions/:id/reactions', (req, res) => {
     const questionId = req.params.id;
-    db.all(
-        `SELECT reaction, COUNT(*) as count FROM question_reactions WHERE question_id = ? GROUP BY reaction`,
+    pool.query(
+        `SELECT reaction, COUNT(*) as count FROM question_reactions WHERE question_id = $1 GROUP BY reaction`,
         [questionId],
-        (err, rows) => {
+        (err, result) => {
             if (err) {
                 console.error('Error fetching reactions:', err);
                 return res.status(500).json({ error: 'Failed to fetch reactions' });
             }
             const result = { like: 0, dislike: 0 };
-            rows.forEach(r => { result[r.reaction] = r.count; });
+            result.rows.forEach(r => { result[r.reaction] = r.count; });
             res.json(result);
         }
     );
@@ -516,13 +520,13 @@ app.get('/api/questions/:id/reactions', (req, res) => {
 function getReactionsForQuestions(questionIds) {
     return new Promise((resolve, reject) => {
         if (!questionIds.length) return resolve({});
-        db.all(
-            `SELECT question_id, reaction, COUNT(*) as count FROM question_reactions WHERE question_id IN (${questionIds.map(() => '?').join(',')}) GROUP BY question_id, reaction`,
+        pool.query(
+            `SELECT question_id, reaction, COUNT(*) as count FROM question_reactions WHERE question_id IN (${questionIds.map(() => '$').join(',')}) GROUP BY question_id, reaction`,
             questionIds,
-            (err, rows) => {
+            (err, result) => {
                 if (err) return reject(err);
                 const map = {};
-                rows.forEach(r => {
+                result.rows.forEach(r => {
                     if (!map[r.question_id]) map[r.question_id] = { like: 0, dislike: 0 };
                     map[r.question_id][r.reaction] = r.count;
                 });
@@ -536,18 +540,18 @@ function getReactionsForQuestions(questionIds) {
 function getVotesForQuestions(questionIds) {
     return new Promise((resolve, reject) => {
         if (!questionIds.length) return resolve({});
-        db.all(
+        pool.query(
             `SELECT q.id as question_id, COUNT(v.id) as votes
              FROM questions q
              LEFT JOIN answers a ON a.question_id = q.id
              LEFT JOIN votes v ON v.answer_id = a.id
-             WHERE q.id IN (${questionIds.map(() => '?').join(',')})
+             WHERE q.id IN (${questionIds.map(() => '$').join(',')})
              GROUP BY q.id`,
             questionIds,
-            (err, rows) => {
+            (err, result) => {
                 if (err) return reject(err);
                 const map = {};
-                rows.forEach(r => { map[r.question_id] = r.votes; });
+                result.rows.forEach(r => { map[r.question_id] = r.votes; });
                 resolve(map);
             }
         );
@@ -557,16 +561,16 @@ function getVotesForQuestions(questionIds) {
 // Helper to get answers (with vote counts) for a question
 function getAnswersForQuestion(questionId) {
     return new Promise((resolve, reject) => {
-        db.all(
+        pool.query(
             `SELECT a.id, a.text, COUNT(v.id) as votes
              FROM answers a
              LEFT JOIN votes v ON a.id = v.answer_id
-             WHERE a.question_id = ?
+             WHERE a.question_id = $1
              GROUP BY a.id`,
             [questionId],
-            (err, rows) => {
+            (err, result) => {
                 if (err) return reject(err);
-                resolve(rows.map(r => ({ id: r.id, text: r.text, votes: r.votes })));
+                resolve(result.rows.map(r => ({ id: r.id, text: r.text, votes: r.votes })));
             }
         );
     });
@@ -625,19 +629,19 @@ app.get('/api/questions/top', async (req, res) => {
                 startDate = new Date(now.setMonth(now.getMonth() - 1));
                 break;
         }
-        whereConditions.push('q.created_at >= ?');
+        whereConditions.push('q.created_at >= $' + (params.length + 1));
         params.push(startDate.toISOString());
     }
 
     // Category filter (if implemented)
     if (category !== 'all') {
-        whereConditions.push('q.category = ?');
+        whereConditions.push('q.category = $' + (params.length + 1));
         params.push(category);
     }
 
     // Minimum votes filter
     if (minVotes > 0) {
-        whereConditions.push('COALESCE(vq.votes, 0) >= ?');
+        whereConditions.push('COALESCE(vq.votes, 0) >= $' + (params.length + 1));
         params.push(minVotes);
     }
 
@@ -668,7 +672,7 @@ app.get('/api/questions/top', async (req, res) => {
     baseQuery += ' LIMIT 20';
 
     // Execute the query
-    db.all(baseQuery, params, async (err, questions) => {
+    pool.query(baseQuery, params, async (err, result) => {
         if (err) {
             console.error('Error fetching top questions:', err);
             return res.status(500).json({ error: 'Failed to fetch top questions' });
@@ -676,7 +680,7 @@ app.get('/api/questions/top', async (req, res) => {
 
         // Get answers for each question
         try {
-            const questionsWithAnswers = await Promise.all(questions.map(async (question) => {
+            const questionsWithAnswers = await Promise.all(result.rows.map(async (question) => {
                 const answers = await getAnswersForQuestion(question.id);
                 return {
                     ...question,
