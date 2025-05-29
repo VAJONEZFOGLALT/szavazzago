@@ -334,27 +334,51 @@ app.delete('/api/questions/:id', authenticateToken, (req, res) => {
             return res.status(403).json({ error: 'Not authorized to delete this question' });
         }
 
-        // Delete votes first (due to foreign key constraints)
-        pool.query('DELETE FROM votes WHERE question_id = $1', [questionId], (err) => {
+        // Start a transaction
+        pool.query('BEGIN', (err) => {
             if (err) {
-                console.error('Error deleting votes:', err);
-                return res.status(500).json({ error: 'Failed to delete votes' });
+                console.error('Error starting transaction:', err);
+                return res.status(500).json({ error: 'Failed to start transaction' });
             }
 
-            // Delete answers
-            pool.query('DELETE FROM answers WHERE question_id = $1', [questionId], (err) => {
+            // Delete in correct order: reactions -> votes -> answers -> question
+            pool.query('DELETE FROM question_reactions WHERE question_id = $1', [questionId], (err) => {
                 if (err) {
-                    console.error('Error deleting answers:', err);
-                    return res.status(500).json({ error: 'Failed to delete answers' });
+                    console.error('Error deleting reactions:', err);
+                    pool.query('ROLLBACK');
+                    return res.status(500).json({ error: 'Failed to delete reactions' });
                 }
 
-                // Finally delete the question
-                pool.query('DELETE FROM questions WHERE id = $1', [questionId], (err) => {
+                pool.query('DELETE FROM votes WHERE question_id = $1', [questionId], (err) => {
                     if (err) {
-                        console.error('Error deleting question:', err);
-                        return res.status(500).json({ error: 'Failed to delete question' });
+                        console.error('Error deleting votes:', err);
+                        pool.query('ROLLBACK');
+                        return res.status(500).json({ error: 'Failed to delete votes' });
                     }
-                    res.json({ success: true });
+
+                    pool.query('DELETE FROM answers WHERE question_id = $1', [questionId], (err) => {
+                        if (err) {
+                            console.error('Error deleting answers:', err);
+                            pool.query('ROLLBACK');
+                            return res.status(500).json({ error: 'Failed to delete answers' });
+                        }
+
+                        pool.query('DELETE FROM questions WHERE id = $1', [questionId], (err) => {
+                            if (err) {
+                                console.error('Error deleting question:', err);
+                                pool.query('ROLLBACK');
+                                return res.status(500).json({ error: 'Failed to delete question' });
+                            }
+
+                            pool.query('COMMIT', (err) => {
+                                if (err) {
+                                    console.error('Error committing transaction:', err);
+                                    return res.status(500).json({ error: 'Failed to commit transaction' });
+                                }
+                                res.json({ success: true });
+                            });
+                        });
+                    });
                 });
             });
         });
