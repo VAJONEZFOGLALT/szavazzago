@@ -7,9 +7,10 @@
     "dev": "vite",
     "build": "vite build && npm run copy-html",
     "preview": "vite preview",
-    "copy-html": "copy index.html dist\\index.html && copy sajatkerdes.html dist\\sajatkerdes.html && copy toplista.html dist\\toplista.html && copy gyik.html dist\\gyik.html && copy admin.html dist\\admin.html"
+    "copy-html": "cpx \"*.html\" dist/"
   },
   "devDependencies": {
+    "cpx": "^1.5.0",
     "vite": "^6.3.5"
   }
 }
