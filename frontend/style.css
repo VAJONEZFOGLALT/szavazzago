@@ -1,8 +1,16 @@
-body {
+html, body {
+  height: 100% !important;
+  min-height: 100% !important;
   background: #181818 !important;
   color: #fff !important;
 }
 
-html {
-  background: #181818 !important;
+body::before {
+  content: 'TEST';
+  color: red;
+  font-size: 40px;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
 } 
