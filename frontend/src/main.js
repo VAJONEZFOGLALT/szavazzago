@@ -1,3 +1,5 @@
+import './style.css';
+
 // Constants
 const MAX_QUESTION_LENGTH = 200;
 const MAX_ANSWER_LENGTH = 100;
